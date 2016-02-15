@@ -1,6 +1,6 @@
 ﻿ToDo List
 
-
+- [ ] Matches filter Doubles and Recognize Multimatches
 - [ ] Asynchronous Thread
 - [ ] Progress Bar
 - [ ] Add some Informations
