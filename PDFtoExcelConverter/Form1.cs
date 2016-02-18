@@ -149,30 +149,32 @@ namespace PDFtoExcelConverter
                         resultstring = text.ToString().Split(new char[]{' '});
                         for (int i = 0; i < resultstring.Length; i++)
                         {
-                            
-                            if (columnpointer > maxcolumn)
-                            {
-                                columnpointer = mincolumn;
-                                rowpointer += no_copies;
-                            }
-
-                            if ((no_copies + rowpointer) > maxrow)
-                            {
-                                workbook.SaveAs(System.IO.Path.GetDirectoryName(path_to_pdf) + "\\" + System.IO.Path.GetFileNameWithoutExtension(path_to_pdf) + "_" + sheet_number.ToString() + ".xls", Microsoft.Office.Interop.Excel.XlFileFormat.xlWorkbookDefault, Type.Missing, Type.Missing, true, false, XlSaveAsAccessMode.xlNoChange, XlSaveConflictResolution.xlLocalSessionChanges, Type.Missing, Type.Missing);
-                                for (int l = minrow; l == maxrow; l++)
-                                {
-                                    for (int n = mincolumn; n == maxcolumn; n++)
-                                    {
-                                        sheet_template.Cells[l, n] = "";
-                                    }
-                                }
-                                sheet_number++;
-                                rowpointer = minrow;
-                            }
+                          
 
                             //
                             foreach(Match match in bmk_regex.Matches(resultstring[i]))
                             {
+
+                                if (columnpointer > maxcolumn)
+                                {
+                                    columnpointer = mincolumn;
+                                    rowpointer += no_copies;
+                                }
+
+                                if ((no_copies + rowpointer) > (maxrow+1))
+                                {
+                                    workbook.SaveAs(System.IO.Path.GetDirectoryName(path_to_pdf) + "\\" + System.IO.Path.GetFileNameWithoutExtension(path_to_pdf) + "_" + sheet_number.ToString() + ".xls", Microsoft.Office.Interop.Excel.XlFileFormat.xlWorkbookDefault, Type.Missing, Type.Missing, true, false, XlSaveAsAccessMode.xlNoChange, XlSaveConflictResolution.xlLocalSessionChanges, Type.Missing, Type.Missing);
+                                    for (int l = minrow; l == maxrow; l++)
+                                    {
+                                        for (int n = mincolumn; n == maxcolumn; n++)
+                                        {
+                                            sheet_template.Cells[l, n] = "";
+                                        }
+                                    }
+                                    sheet_number++;
+                                    rowpointer = minrow;
+                                }
+
                                 if (findstring(match.Value, lookup) == false)
                                 {
                                     for (int k = 0; k < no_copies; k++)
