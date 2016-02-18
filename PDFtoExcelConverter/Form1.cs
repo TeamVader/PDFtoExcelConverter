@@ -84,7 +84,7 @@ namespace PDFtoExcelConverter
         {
 
             Regex bmk_regex = new Regex(@"[-+]?([0-9]*\.[0-9]+|[0-9]+)[A-Z][-+]?([0-9]*\.[0-9]+|[0-9]+)");
-            Match match;
+           // Match match;
             try
             {
 
@@ -101,7 +101,9 @@ namespace PDFtoExcelConverter
                 int maxcolumn=21;
                 int sheet_number = 1;
                 string[] resultstring;
-                
+                string[] lookup = new string[2000];
+                int arraypointer=0;
+
                 var text = new StringBuilder();
 
                 // The PdfReader object implements IDisposable.Dispose, so you can
@@ -169,28 +171,33 @@ namespace PDFtoExcelConverter
                             }
 
                             //
-                            match = bmk_regex.Match(resultstring[i]);
-                            if (match.Success)
+                            foreach(Match match in bmk_regex.Matches(resultstring[i]))
                             {
-                                for (int k = 0; k < no_copies; k++)
+                                if (findstring(match.Value, lookup) == false)
                                 {
+                                    for (int k = 0; k < no_copies; k++)
+                                    {
 
-                                    sheet_template.Cells[rowpointer + k, columnpointer] = match.Value;
-                                  //  MessageBox.Show(columnpointer.ToString() + " Reihe" + rowpointer.ToString());
-                                    
+                                        sheet_template.Cells[rowpointer + k, columnpointer] = match.Value;
+                                        //  MessageBox.Show(columnpointer.ToString() + " Reihe" + rowpointer.ToString());
 
 
+
+                                    }
+                                    lookup[arraypointer] = match.Value;
+                                    arraypointer++;
+                                    columnpointer += 2;
                                 }
-                                columnpointer += 2;
                             }
-                          
+                            
                            
                         }
                        
                     }
 
                     workbook.SaveAs(System.IO.Path.GetDirectoryName(path_to_pdf) + "\\" + System.IO.Path.GetFileNameWithoutExtension(path_to_pdf) + "_" + sheet_number.ToString() + ".xls", Microsoft.Office.Interop.Excel.XlFileFormat.xlWorkbookDefault, Type.Missing, Type.Missing, true, false, XlSaveAsAccessMode.xlNoChange, XlSaveConflictResolution.xlLocalSessionChanges, Type.Missing, Type.Missing);
-
+                    lookup=null;
+                    resultstring=null;
 
                     // workbook.ExportAsFixedFormat(XlFixedFormatType.xlTypePDF, excel_path[0] + "_bom.pdf");
                     // Close the workbook without saving changes.
@@ -223,6 +230,24 @@ namespace PDFtoExcelConverter
             {
                 MessageBox.Show(ex.Message + ex.StackTrace);
             }
+        }
+
+        /// <summary>
+        /// Lookup for String in array
+        /// </summary>
+        /// <param name="search"></param>
+        /// <param name="array"></param>
+        /// <returns></returns>
+        private static bool findstring(string search,string[] array)
+        {
+            for (int i = 0; i < array.Length; i++)
+            {
+                if (search == array[i])
+                {
+                    return true;
+                }
+            }
+            return false;
         }
 
         private void Form1_Load(object sender, EventArgs e)
