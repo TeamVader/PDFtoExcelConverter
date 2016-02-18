@@ -103,7 +103,7 @@ namespace PDFtoExcelConverter
                 string[] resultstring;
                 string[] lookup = new string[2000];
                 int arraypointer=0;
-
+                bool saved = false;
                 var text = new StringBuilder();
 
                 // The PdfReader object implements IDisposable.Dispose, so you can
@@ -173,13 +173,14 @@ namespace PDFtoExcelConverter
                                     }
                                     sheet_number++;
                                     rowpointer = minrow;
+                                    saved = true;
                                 }
 
                                 if (findstring(match.Value, lookup) == false)
                                 {
                                     for (int k = 0; k < no_copies; k++)
                                     {
-
+                                        saved = false;
                                         sheet_template.Cells[rowpointer + k, columnpointer] = match.Value;
                                         //  MessageBox.Show(columnpointer.ToString() + " Reihe" + rowpointer.ToString());
 
@@ -196,9 +197,11 @@ namespace PDFtoExcelConverter
                         }
                        
                     }
-
-                    workbook.SaveAs(System.IO.Path.GetDirectoryName(path_to_pdf) + "\\" + System.IO.Path.GetFileNameWithoutExtension(path_to_pdf) + "_" + sheet_number.ToString() + ".xls", Microsoft.Office.Interop.Excel.XlFileFormat.xlWorkbookDefault, Type.Missing, Type.Missing, true, false, XlSaveAsAccessMode.xlNoChange, XlSaveConflictResolution.xlLocalSessionChanges, Type.Missing, Type.Missing);
-                    lookup=null;
+                    if (saved==false)
+                    {
+                        workbook.SaveAs(System.IO.Path.GetDirectoryName(path_to_pdf) + "\\" + System.IO.Path.GetFileNameWithoutExtension(path_to_pdf) + "_" + sheet_number.ToString() + ".xls", Microsoft.Office.Interop.Excel.XlFileFormat.xlWorkbookDefault, Type.Missing, Type.Missing, true, false, XlSaveAsAccessMode.xlNoChange, XlSaveConflictResolution.xlLocalSessionChanges, Type.Missing, Type.Missing);
+                    }
+                            lookup=null;
                     resultstring=null;
 
                     // workbook.ExportAsFixedFormat(XlFixedFormatType.xlTypePDF, excel_path[0] + "_bom.pdf");
