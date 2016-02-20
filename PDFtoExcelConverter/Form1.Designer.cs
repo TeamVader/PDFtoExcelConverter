@@ -34,6 +34,8 @@
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
             this.label1 = new System.Windows.Forms.Label();
             this.cbocopies = new System.Windows.Forms.ComboBox();
+            this.progressBar1 = new System.Windows.Forms.ProgressBar();
+            this.labelstopwatch = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.SuspendLayout();
             // 
@@ -94,11 +96,30 @@
             this.cbocopies.TabIndex = 5;
             this.cbocopies.SelectedIndexChanged += new System.EventHandler(this.cbocopies_SelectedIndexChanged);
             // 
+            // progressBar1
+            // 
+            this.progressBar1.Location = new System.Drawing.Point(16, 40);
+            this.progressBar1.Name = "progressBar1";
+            this.progressBar1.Size = new System.Drawing.Size(421, 23);
+            this.progressBar1.TabIndex = 6;
+            this.progressBar1.Visible = false;
+            // 
+            // labelstopwatch
+            // 
+            this.labelstopwatch.AutoSize = true;
+            this.labelstopwatch.Location = new System.Drawing.Point(504, 197);
+            this.labelstopwatch.Name = "labelstopwatch";
+            this.labelstopwatch.Size = new System.Drawing.Size(0, 17);
+            this.labelstopwatch.TabIndex = 7;
+            this.labelstopwatch.TextAlign = System.Drawing.ContentAlignment.TopRight;
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(645, 218);
+            this.Controls.Add(this.labelstopwatch);
+            this.Controls.Add(this.progressBar1);
             this.Controls.Add(this.cbocopies);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.pictureBox1);
@@ -124,6 +145,8 @@
         private System.Windows.Forms.PictureBox pictureBox1;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.ComboBox cbocopies;
+        private System.Windows.Forms.ProgressBar progressBar1;
+        private System.Windows.Forms.Label labelstopwatch;
     }
 }
 
