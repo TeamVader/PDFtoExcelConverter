@@ -30,7 +30,6 @@ namespace PDFtoExcelConverter
         {
             InitializeComponent();
            
-            
         }
 
         private void buttopen_Click(object sender, EventArgs e)
