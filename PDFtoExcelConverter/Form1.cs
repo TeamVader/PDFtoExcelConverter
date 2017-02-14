@@ -36,7 +36,6 @@ namespace PDFtoExcelConverter
         {
            
          OpenFileDialog openFileDialog1 = new OpenFileDialog();
-
          openFileDialog1.InitialDirectory = "c:\\" ;
           openFileDialog1.Filter = "PDF (*.pdf)|*.pdf" ;
           openFileDialog1.FilterIndex = 2 ;
