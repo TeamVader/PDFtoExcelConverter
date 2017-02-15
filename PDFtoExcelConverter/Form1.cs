@@ -191,7 +191,7 @@ namespace PDFtoExcelConverter
                                         for (int k = 0; k < no_copies; k++)
                                         {
                                             saved = false;
-                                            sheet_template.Cells[rowpointer + k, columnpointer] = match.Value;
+                                            sheet_template.Cells[rowpointer + k, columnpointer] = match.Value.Replace("-","");
                                             //  MessageBox.Show(columnpointer.ToString() + " Reihe" + rowpointer.ToString());
 
 
