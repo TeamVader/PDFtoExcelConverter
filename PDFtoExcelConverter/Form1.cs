@@ -96,9 +96,9 @@ namespace PDFtoExcelConverter
                 excel_app.DisplayAlerts = false;
                 int rowpointer = 0;
                 int columnpointer = 0;
-                int minrow = 2;
-                int mincolumn = 3;
-                int maxrow = 43;
+                int minrow = 1;
+                int mincolumn = 1;
+                int maxrow = 44;
                 int maxcolumn = 21;
                 int sheet_number = 1;
                 string[] resultstring;
@@ -147,7 +147,7 @@ namespace PDFtoExcelConverter
 
                         // Get the first worksheet.
                         Microsoft.Office.Interop.Excel.Sheets sheets = workbook.Sheets;
-                        Microsoft.Office.Interop.Excel.Worksheet sheet_template = sheets["Vorlage"];
+                        Microsoft.Office.Interop.Excel.Worksheet sheet_template = sheets["Tabelle1"];
 
                         rowpointer = minrow;
                         columnpointer = mincolumn;
