@@ -156,14 +156,32 @@ namespace PDFtoExcelConverter
                         {
                             resultstring = text.ToString().Split(new char[] { ' ' });
 
-                          
-                            for (int i = 0; i < resultstring.Length; i++)
+
+                            for (int j = 0; j < resultstring.Length; j++)
                             {
 
 
                                 //
-                                foreach (Match match in bmk_regex.Matches(resultstring[i]))
+                                foreach (Match match in bmk_regex.Matches(resultstring[j]))
                                 {
+
+                                   
+
+                                    if (findstring(match.Value, lookup) == false)
+                                    {
+                                       
+                                        lookup[arraypointer] = match.Value;
+                                        arraypointer++;
+                                       
+                                    }
+                                }
+
+                            }
+
+                            Array.Sort(lookup, StringComparer.InvariantCulture);
+
+                            for (int i = 0; i < lookup.Length-1; i++)
+                            {
 
                                     if (columnpointer > maxcolumn)
                                     {
@@ -186,22 +204,21 @@ namespace PDFtoExcelConverter
                                         saved = true;
                                     }
 
-                                    if (findstring(match.Value, lookup) == false)
+                                    if (!string.IsNullOrEmpty(lookup[i]))
                                     {
                                         for (int k = 0; k < no_copies; k++)
                                         {
                                             saved = false;
-                                            sheet_template.Cells[rowpointer + k, columnpointer] = match.Value.Replace("-","");
+                                            sheet_template.Cells[rowpointer + k, columnpointer] = lookup[i].Replace("-","");
                                             //  MessageBox.Show(columnpointer.ToString() + " Reihe" + rowpointer.ToString());
 
 
 
                                         }
-                                        lookup[arraypointer] = match.Value;
-                                        arraypointer++;
+                                    
                                         columnpointer += 2;
                                     }
-                                }
+                                
 
                                 percentFinished = (i / resultstring.Length) * 100;
                                 worker.ReportProgress(percentFinished);
