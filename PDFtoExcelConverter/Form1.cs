@@ -29,46 +29,46 @@ namespace PDFtoExcelConverter
         public Form1()
         {
             InitializeComponent();
-           
+
         }
 
         private void buttopen_Click(object sender, EventArgs e)
         {
-           
-         OpenFileDialog openFileDialog1 = new OpenFileDialog();
-         openFileDialog1.InitialDirectory = "c:\\" ;
-          openFileDialog1.Filter = "PDF (*.pdf)|*.pdf" ;
-          openFileDialog1.FilterIndex = 2 ;
-          openFileDialog1.RestoreDirectory = true ;
-          openFileDialog1.Multiselect = false;
 
-          if (openFileDialog1.ShowDialog() == DialogResult.OK)
-          {
-              path_to_pdf = openFileDialog1.FileName;
-              if (System.IO.Path.GetExtension(path_to_pdf) == ".pdf")
-              {
-                  File_Selected=true;
-                  buttconvert.Enabled=true;
-                  labelname.Text = System.IO.Path.GetFileNameWithoutExtension(path_to_pdf);
-              }
-              else
-              {
-                  File_Selected = false;
-                      buttconvert.Enabled=false;
-                      labelname.Text = "No PDF!!";
-              }
-          }
-          else
-          {
-              //File_Selected = false;
-              buttconvert.Enabled = false;
-              labelname.Text = "";
-          }
-}
+            OpenFileDialog openFileDialog1 = new OpenFileDialog();
+            openFileDialog1.InitialDirectory = "c:\\";
+            openFileDialog1.Filter = "PDF (*.pdf)|*.pdf";
+            openFileDialog1.FilterIndex = 2;
+            openFileDialog1.RestoreDirectory = true;
+            openFileDialog1.Multiselect = false;
+
+            if (openFileDialog1.ShowDialog() == DialogResult.OK)
+            {
+                path_to_pdf = openFileDialog1.FileName;
+                if (System.IO.Path.GetExtension(path_to_pdf) == ".pdf")
+                {
+                    File_Selected = true;
+                    buttconvert.Enabled = true;
+                    labelname.Text = System.IO.Path.GetFileNameWithoutExtension(path_to_pdf);
+                }
+                else
+                {
+                    File_Selected = false;
+                    buttconvert.Enabled = false;
+                    labelname.Text = "No PDF!!";
+                }
+            }
+            else
+            {
+                //File_Selected = false;
+                buttconvert.Enabled = false;
+                labelname.Text = "";
+            }
+        }
 
         private void cbocopies_SelectedIndexChanged(object sender, EventArgs e)
         {
-           // MessageBox.Show(cbocopies.SelectedItem.ToString());
+            // MessageBox.Show(cbocopies.SelectedItem.ToString());
             no_copies = Int32.Parse(cbocopies.SelectedItem.ToString());
         }
 
@@ -112,11 +112,11 @@ namespace PDFtoExcelConverter
                 using (var pdfReader = new PdfReader(path_to_pdf))
                 {
                     worker.ReportProgress(percentFinished);
-                  
+
                     // Loop through each page of the document
                     for (var page = 1; page <= pdfReader.NumberOfPages; page++)
                     {
-                        
+
                         ITextExtractionStrategy strategy = new SimpleTextExtractionStrategy();
 
                         var currentText = PdfTextExtractor.GetTextFromPage(
@@ -135,7 +135,7 @@ namespace PDFtoExcelConverter
                         worker.ReportProgress(percentFinished);
 
                     }
-                    
+
 
                     // MessageBox.Show(startup_path + "\\" + Exceltemplate);
                     if (File.Exists(startup_path + "\\" + Exceltemplate))
@@ -165,14 +165,14 @@ namespace PDFtoExcelConverter
                                 foreach (Match match in bmk_regex.Matches(resultstring[j]))
                                 {
 
-                                   
+
 
                                     if (findstring(match.Value, lookup) == false)
                                     {
-                                       
+
                                         lookup[arraypointer] = match.Value;
                                         arraypointer++;
-                                       
+
                                     }
                                 }
 
@@ -180,45 +180,45 @@ namespace PDFtoExcelConverter
 
                             Array.Sort(lookup, StringComparer.InvariantCulture);
 
-                            for (int i = 0; i < lookup.Length-1; i++)
+                            for (int i = 0; i < lookup.Length - 1; i++)
                             {
 
-                                    if (columnpointer > maxcolumn)
-                                    {
-                                        columnpointer = mincolumn;
-                                        rowpointer += no_copies;
-                                    }
+                                if (columnpointer > maxcolumn)
+                                {
+                                    columnpointer = mincolumn;
+                                    rowpointer += no_copies;
+                                }
 
-                                    if ((no_copies + rowpointer) > (maxrow + 1))
+                                if ((no_copies + rowpointer) > (maxrow + 1))
+                                {
+                                    workbook.SaveAs(System.IO.Path.GetDirectoryName(path_to_pdf) + "\\" + System.IO.Path.GetFileNameWithoutExtension(path_to_pdf) + "_" + sheet_number.ToString() + ".xls"); //, Microsoft.Office.Interop.Excel.XlFileFormat.xlWorkbookDefault, Type.Missing, Type.Missing, true, false, XlSaveAsAccessMode.xlNoChange, XlSaveConflictResolution.xlLocalSessionChanges, Type.Missing, Type.Missing);
+                                    for (int l = minrow; l == maxrow; l++)
                                     {
-                                        workbook.SaveAs(System.IO.Path.GetDirectoryName(path_to_pdf) + "\\" + System.IO.Path.GetFileNameWithoutExtension(path_to_pdf) + "_" + sheet_number.ToString() + ".xls"); //, Microsoft.Office.Interop.Excel.XlFileFormat.xlWorkbookDefault, Type.Missing, Type.Missing, true, false, XlSaveAsAccessMode.xlNoChange, XlSaveConflictResolution.xlLocalSessionChanges, Type.Missing, Type.Missing);
-                                        for (int l = minrow; l == maxrow; l++)
+                                        for (int n = mincolumn; n == maxcolumn; n++)
                                         {
-                                            for (int n = mincolumn; n == maxcolumn; n++)
-                                            {
-                                                sheet_template.Cells[l, n] = "";
-                                            }
+                                            sheet_template.Cells[l, n] = "";
                                         }
-                                        sheet_number++;
-                                        rowpointer = minrow;
-                                        saved = true;
                                     }
+                                    sheet_number++;
+                                    rowpointer = minrow;
+                                    saved = true;
+                                }
 
-                                    if (!string.IsNullOrEmpty(lookup[i]))
+                                if (!string.IsNullOrEmpty(lookup[i]))
+                                {
+                                    for (int k = 0; k < no_copies; k++)
                                     {
-                                        for (int k = 0; k < no_copies; k++)
-                                        {
-                                            saved = false;
-                                            sheet_template.Cells[rowpointer + k, columnpointer] = lookup[i].Replace("-","");
-                                            //  MessageBox.Show(columnpointer.ToString() + " Reihe" + rowpointer.ToString());
+                                        saved = false;
+                                        sheet_template.Cells[rowpointer + k, columnpointer] = lookup[i].Replace("-", "");
+                                        //  MessageBox.Show(columnpointer.ToString() + " Reihe" + rowpointer.ToString());
 
 
 
-                                        }
-                                    
-                                        columnpointer += 2;
                                     }
-                                
+
+                                    columnpointer += 2;
+                                }
+
 
                                 percentFinished = (i / resultstring.Length) * 100;
                                 worker.ReportProgress(percentFinished);
@@ -229,13 +229,15 @@ namespace PDFtoExcelConverter
                         {
                             workbook.SaveAs(System.IO.Path.GetDirectoryName(path_to_pdf) + "\\" + System.IO.Path.GetFileNameWithoutExtension(path_to_pdf) + "_" + sheet_number.ToString() + ".xls"); //, Microsoft.Office.Interop.Excel.XlFileFormat.xlWorkbookDefault, Type.Missing, Type.Missing, true, false, XlSaveAsAccessMode.xlNoChange, XlSaveConflictResolution.xlLocalSessionChanges, Type.Missing, Type.Missing);
                         }
-                        lookup = null;
-                        resultstring = null;
+
 
                         // workbook.ExportAsFixedFormat(XlFixedFormatType.xlTypePDF, excel_path[0] + "_bom.pdf");
                         // Close the workbook without saving changes.
-                       
+                        XML_Functions.Create_Kabel_XML_File(System.IO.Path.GetDirectoryName(path_to_pdf) + "\\" + "Kabelbeschriftungen.wscx", lookup, no_copies);
 
+
+                        lookup = null;
+                        resultstring = null;
                         System.Runtime.InteropServices.Marshal.ReleaseComObject(sheet_template);
                         System.Runtime.InteropServices.Marshal.ReleaseComObject(sheets);
                         workbook.Close(0);
@@ -251,10 +253,12 @@ namespace PDFtoExcelConverter
                                 process.Kill();
                             }
                         }
+
+                        Process.Start("explorer.exe", System.IO.Path.GetDirectoryName(path_to_pdf));
                     }
                     else
                     {
-                       // labelname.Text = "No Template in Folder";
+                        // labelname.Text = "No Template in Folder";
                     }
                     //MessageBox.Show(text.ToString());
                 }
@@ -267,11 +271,33 @@ namespace PDFtoExcelConverter
 
 
 
-            
-              
-               // System.Threading.Thread.Sleep(50);
-          
+
+
+            // System.Threading.Thread.Sleep(50);
+
         }
+
+        public class CustomComparer : IComparer<string>
+        {
+            public int Compare(string x, string y)
+            {
+                var regex = new Regex(@"[-+]?([0-9])");
+
+                // run the regex on both strings
+                var xRegexResult = regex.Match(x);
+                var yRegexResult = regex.Match(y);
+
+                // check if they are both numbers
+                if (xRegexResult.Success && yRegexResult.Success)
+                {
+                    return int.Parse(xRegexResult.Groups[1].Value).CompareTo(int.Parse(yRegexResult.Groups[1].Value));
+                }
+
+                // otherwise return as string comparison
+                return x.CompareTo(y);
+            }
+        }
+
 
         void worker_ProgressChanged(object sender, ProgressChangedEventArgs e)
         {
@@ -279,7 +305,7 @@ namespace PDFtoExcelConverter
             {
                 labelname.Text = "Converting File";
             }
-         
+
             progressBar1.Value = e.ProgressPercentage;
         }
 
@@ -299,7 +325,7 @@ namespace PDFtoExcelConverter
         /// <param name="search"></param>
         /// <param name="array"></param>
         /// <returns></returns>
-        private static bool findstring(string search,string[] array)
+        private static bool findstring(string search, string[] array)
         {
             for (int i = 0; i < array.Length; i++)
             {
@@ -331,8 +357,8 @@ namespace PDFtoExcelConverter
             worker.RunWorkerCompleted +=
                        new RunWorkerCompletedEventHandler(worker_RunWorkerCompleted);
         }
-        
 
-        
+
+
     }
 }
