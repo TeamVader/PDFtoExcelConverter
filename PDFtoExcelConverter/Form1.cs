@@ -82,7 +82,9 @@ namespace PDFtoExcelConverter
         void worker_DoWork(object sender, DoWorkEventArgs e)
         {
             sw = new Stopwatch();
-            Regex bmk_regex = new Regex(@"[-+]?([0-9]*\.[0-9]+|[0-9]+)[A-Z][-+]?([0-9]*\.[0-9]+|[0-9]+)");
+            Regex bmk_regex = new Regex(@"[-+]?([0-9]{1,4})[A-Z][-+]?([0-9]*\.[0-9]{1,3}|[0-9]{1,3})");
+            Regex klemme_regex = new Regex(@"[-+]?([0-9]{4,5})");
+
             int percentFinished = 0;
             //int increment=0;
             // Match match;
@@ -103,6 +105,9 @@ namespace PDFtoExcelConverter
                 int sheet_number = 1;
                 string[] resultstring;
                 string[] lookup = new string[2000];
+                int[] klemme_lookup = new int[2000];
+                int dummy;
+                int klemmearraypointer = 0;
                 int arraypointer = 0;
                 bool saved = false;
                 var text = new StringBuilder();
@@ -159,28 +164,57 @@ namespace PDFtoExcelConverter
 
                             for (int j = 0; j < resultstring.Length; j++)
                             {
+                                foreach (Match match in klemme_regex.Matches(resultstring[j]))
+                                {
+                                    if (Int32.TryParse(match.Value, out dummy))
+                                    {
+                                        if (dummy >= 999 && dummy <= 99999)
+                                        {
+                                            if (findint(dummy, klemme_lookup) == false)
+                                            {
+                                                klemme_lookup[klemmearraypointer] = dummy;
 
+                                                klemmearraypointer++;
 
+                                            }
+                                        }
+                                    }
+                                }
                                 //
                                 foreach (Match match in bmk_regex.Matches(resultstring[j]))
                                 {
 
 
 
-                                    if (findstring(match.Value, lookup) == false)
+                                    if (findstring(match.Value.Replace("-", ""), lookup) == false)
                                     {
 
-                                        lookup[arraypointer] = match.Value;
+                                        lookup[arraypointer] = match.Value.Replace("-", "");
                                         arraypointer++;
 
                                     }
                                 }
 
                             }
+                            for (int k = 0; k < klemme_lookup.Length; k++)
+                            {
+                                for (int i = 100; i < 100000; i = i + 100)
+                                {
+                                    if ((klemme_lookup[k] - i) >= 1 && (klemme_lookup[k] - i) <= 99)
+                                    {
+                                        if ((klemme_lookup[k] - i) >= 30)
+                                        {
+                                            klemme_lookup[k] = 0;
+                                        }
+                                        break;
+                                    }
+                                   
 
+                                }
+                            }
                             Array.Sort(lookup, StringComparer.InvariantCulture);
-
-                            for (int i = 0; i < lookup.Length - 1; i++)
+                            Array.Sort(klemme_lookup);
+                            for (int i = 0; i < lookup.Length; i++)
                             {
 
                                 if (columnpointer > maxcolumn)
@@ -209,7 +243,7 @@ namespace PDFtoExcelConverter
                                     for (int k = 0; k < no_copies; k++)
                                     {
                                         saved = false;
-                                        sheet_template.Cells[rowpointer + k, columnpointer] = lookup[i].Replace("-", "");
+                                        sheet_template.Cells[rowpointer + k, columnpointer] = lookup[i];
                                         //  MessageBox.Show(columnpointer.ToString() + " Reihe" + rowpointer.ToString());
 
 
@@ -220,8 +254,6 @@ namespace PDFtoExcelConverter
                                 }
 
 
-                                percentFinished = (i / resultstring.Length) * 100;
-                                worker.ReportProgress(percentFinished);
                             }
 
                         }
@@ -234,7 +266,7 @@ namespace PDFtoExcelConverter
                         // workbook.ExportAsFixedFormat(XlFixedFormatType.xlTypePDF, excel_path[0] + "_bom.pdf");
                         // Close the workbook without saving changes.
                         XML_Functions.Create_Kabel_XML_File(System.IO.Path.GetDirectoryName(path_to_pdf) + "\\" + "Kabelbeschriftungen.wscx", lookup, no_copies);
-
+                        XML_Functions.Create_Klemme_XML_File(System.IO.Path.GetDirectoryName(path_to_pdf) + "\\" + "Klemmenbeschriftungen.wscx", klemme_lookup, no_copies);
 
                         lookup = null;
                         resultstring = null;
@@ -326,6 +358,18 @@ namespace PDFtoExcelConverter
         /// <param name="array"></param>
         /// <returns></returns>
         private static bool findstring(string search, string[] array)
+        {
+            for (int i = 0; i < array.Length; i++)
+            {
+                if (search == array[i])
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        private static bool findint(int search, int[] array)
         {
             for (int i = 0; i < array.Length; i++)
             {
