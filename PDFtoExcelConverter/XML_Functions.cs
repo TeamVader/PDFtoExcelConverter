@@ -56,7 +56,9 @@ namespace PDFtoExcelConverter
                         writer.WriteElementString("Distance", "0");
                         
                         //For Loop
+
                         for (int i = 0; i < bmk_names.Length; i++)
+
                         {
                             if (!string.IsNullOrEmpty(bmk_names[i]) )
                             {
