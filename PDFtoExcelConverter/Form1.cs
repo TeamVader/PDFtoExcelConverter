@@ -102,7 +102,7 @@ namespace PDFtoExcelConverter
                 int maxcolumn = 21;
                 int sheet_number = 1;
                 string[] resultstring;
-                string[] lookup = new string[2000];
+                List<string> lookup_list = new List<string>();
                 int arraypointer = 0;
                 bool saved = false;
                 var text = new StringBuilder();
@@ -167,20 +167,34 @@ namespace PDFtoExcelConverter
 
 
 
-                                    if (findstring(match.Value, lookup) == false)
+                                    if (findstring(match.Value, lookup_list) == false)
                                     {
 
-                                        lookup[arraypointer] = match.Value;
-                                        arraypointer++;
+                                        lookup_list.Add(match.Value);
+                                       // arraypointer++;
 
                                     }
                                 }
 
                             }
 
-                            Array.Sort(lookup, StringComparer.InvariantCulture);
 
-                            for (int i = 0; i < lookup.Length - 1; i++)
+                            //all minus signes replaced
+                            for (int i = 0; i < lookup_list.Count - 1; i++)
+                            {
+                                if (!string.IsNullOrEmpty(lookup_list[i]))
+                                {
+                                   lookup_list[i] = lookup_list[i].Replace("-", "");
+                                }
+                            }
+
+                            var mycomparer = new CustomComparer();
+                            lookup_list.Sort(mycomparer);
+                           // lookup_list = lookup_list.OrderBy(num => num).ToList();
+                           // NumericalSort(lookup);
+                           // Array.Sort(lookup, new CustomComparer());
+
+                            for (int i = 0; i < lookup_list.Count - 1; i++)
                             {
 
                                 if (columnpointer > maxcolumn)
@@ -204,12 +218,12 @@ namespace PDFtoExcelConverter
                                     saved = true;
                                 }
 
-                                if (!string.IsNullOrEmpty(lookup[i]))
+                                if (!string.IsNullOrEmpty(lookup_list[i]))
                                 {
                                     for (int k = 0; k < no_copies; k++)
                                     {
                                         saved = false;
-                                        sheet_template.Cells[rowpointer + k, columnpointer] = lookup[i].Replace("-", "");
+                                        sheet_template.Cells[rowpointer + k, columnpointer] = lookup_list[i];
                                         //  MessageBox.Show(columnpointer.ToString() + " Reihe" + rowpointer.ToString());
 
 
@@ -220,8 +234,6 @@ namespace PDFtoExcelConverter
                                 }
 
 
-                                percentFinished = (i / resultstring.Length) * 100;
-                                worker.ReportProgress(percentFinished);
                             }
 
                         }
@@ -233,10 +245,10 @@ namespace PDFtoExcelConverter
 
                         // workbook.ExportAsFixedFormat(XlFixedFormatType.xlTypePDF, excel_path[0] + "_bom.pdf");
                         // Close the workbook without saving changes.
-                        XML_Functions.Create_Kabel_XML_File(System.IO.Path.GetDirectoryName(path_to_pdf) + "\\" + "Kabelbeschriftungen.wscx", lookup, no_copies);
+                        XML_Functions.Create_Kabel_XML_File(System.IO.Path.GetDirectoryName(path_to_pdf) + "\\" + "Kabelbeschriftungen.wscx", lookup_list, no_copies);
 
 
-                        lookup = null;
+                        lookup_list = null;
                         resultstring = null;
                         System.Runtime.InteropServices.Marshal.ReleaseComObject(sheet_template);
                         System.Runtime.InteropServices.Marshal.ReleaseComObject(sheets);
@@ -269,19 +281,37 @@ namespace PDFtoExcelConverter
             }
 
 
-
-
-
-
             // System.Threading.Thread.Sleep(50);
 
+        }
+
+        public static void NumericalSort(string[] ar)
+        {
+            Regex rgx = new Regex("?([0-9]+)");
+            Array.Sort(ar, (a, b) =>
+            {
+                var ma = rgx.Matches(a);
+                var mb = rgx.Matches(b);
+                for (int i = 0; i < ma.Count; ++i)
+                {
+                    int ret = ma[i].Groups[1].Value.CompareTo(mb[i].Groups[1].Value);
+                    if (ret != 0)
+                        return ret;
+
+                    ret = int.Parse(ma[i].Groups[2].Value) - int.Parse(mb[i].Groups[2].Value);
+                    if (ret != 0)
+                        return ret;
+                }
+
+                return 0;
+            });
         }
 
         public class CustomComparer : IComparer<string>
         {
             public int Compare(string x, string y)
             {
-                var regex = new Regex(@"[-+]?([0-9])");
+                var regex = new Regex("^(d+)");
 
                 // run the regex on both strings
                 var xRegexResult = regex.Match(x);
@@ -325,11 +355,11 @@ namespace PDFtoExcelConverter
         /// <param name="search"></param>
         /// <param name="array"></param>
         /// <returns></returns>
-        private static bool findstring(string search, string[] array)
+        private static bool findstring(string search, List<string> stringlist)
         {
-            for (int i = 0; i < array.Length; i++)
+            for (int i = 0; i < stringlist.Count-1; i++)
             {
-                if (search == array[i])
+                if (search == stringlist[i])
                 {
                     return true;
                 }

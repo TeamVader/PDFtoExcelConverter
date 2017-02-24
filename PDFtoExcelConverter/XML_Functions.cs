@@ -12,7 +12,7 @@ namespace PDFtoExcelConverter
     {
 
         //public static string xml_name = AppDomain.CurrentDomain.BaseDirectory + @"networksettings.xml";
-        public static void Create_Kabel_XML_File(string xml_name, string[] bmk_names, int nocopies)
+        public static void Create_Kabel_XML_File(string xml_name, List<string> bmk_names, int nocopies)
         {
 
 
@@ -58,7 +58,7 @@ namespace PDFtoExcelConverter
                         writer.WriteElementString("Distance", "0");
 
                         //For Loop
-                        for (int i = 0; i < bmk_names.Length - 1; i++)
+                        for (int i = 0; i < bmk_names.Count - 1; i++)
                         {
                             if (!string.IsNullOrEmpty(bmk_names[i]))
                             {
