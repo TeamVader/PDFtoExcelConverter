@@ -17,7 +17,7 @@ using System.Text.RegularExpressions;
 
 namespace PDFtoExcelConverter
 {
-    public partial class Form1 : Form
+    public partial class MainForm : Form
     {
         private bool File_Selected;
         private string path_to_pdf;
@@ -25,8 +25,9 @@ namespace PDFtoExcelConverter
         private string startup_path;
         private Stopwatch sw;
         private BackgroundWorker worker;
+        public static int size = 2000;
         private string Exceltemplate = "BMK-Vorlage.xls";
-        public Form1()
+        public MainForm()
         {
             InitializeComponent();
 
@@ -83,7 +84,7 @@ namespace PDFtoExcelConverter
         {
             sw = new Stopwatch();
             Regex bmk_regex = new Regex(@"[-+]?([0-9]{1,4})[A-Z][-+]?([0-9]*\.[0-9]{1,3}|[0-9]{1,3})");
-            Regex klemme_regex = new Regex(@"[-+]?([0-9]{4,5})");
+            
 
             int percentFinished = 0;
             //int increment=0;
@@ -104,10 +105,9 @@ namespace PDFtoExcelConverter
                 int maxcolumn = 21;
                 int sheet_number = 1;
                 string[] resultstring;
-                string[] lookup = new string[2000];
-                int[] klemme_lookup = new int[2000];
-                int dummy;
-                int klemmearraypointer = 0;
+                string[] lookup = new string[size];
+                string[] clamp_lookup = new string[size];
+                string[] cable_lookup = new string[size];
                 int arraypointer = 0;
                 bool saved = false;
                 var text = new StringBuilder();
@@ -160,26 +160,12 @@ namespace PDFtoExcelConverter
                         if (sheet_template != null)
                         {
                             resultstring = text.ToString().Split(new char[] { ' ' });
-
+                            Sort_and_Filter_Algorithms.Filter_Clamp_BMK(clamp_lookup, resultstring);
+                            Sort_and_Filter_Algorithms.Filter_Cable_BMK(cable_lookup, resultstring);
 
                             for (int j = 0; j < resultstring.Length; j++)
                             {
-                                foreach (Match match in klemme_regex.Matches(resultstring[j]))
-                                {
-                                    if (Int32.TryParse(match.Value, out dummy))
-                                    {
-                                        if (dummy >= 999 && dummy <= 99999)
-                                        {
-                                            if (findint(dummy, klemme_lookup) == false)
-                                            {
-                                                klemme_lookup[klemmearraypointer] = dummy;
-
-                                                klemmearraypointer++;
-
-                                            }
-                                        }
-                                    }
-                                }
+                                
                                 //
                                 foreach (Match match in bmk_regex.Matches(resultstring[j]))
                                 {
@@ -196,24 +182,9 @@ namespace PDFtoExcelConverter
                                 }
 
                             }
-                            for (int k = 0; k < klemme_lookup.Length; k++)
-                            {
-                                for (int i = 100; i < 100000; i = i + 100)
-                                {
-                                    if ((klemme_lookup[k] - i) >= 1 && (klemme_lookup[k] - i) <= 99)
-                                    {
-                                        if ((klemme_lookup[k] - i) >= 30)
-                                        {
-                                            klemme_lookup[k] = 0;
-                                        }
-                                        break;
-                                    }
-                                   
-
-                                }
-                            }
+                            
                             Array.Sort(lookup, StringComparer.InvariantCulture);
-                            Array.Sort(klemme_lookup);
+                           
                             for (int i = 0; i < lookup.Length; i++)
                             {
 
@@ -262,11 +233,11 @@ namespace PDFtoExcelConverter
                             workbook.SaveAs(System.IO.Path.GetDirectoryName(path_to_pdf) + "\\" + System.IO.Path.GetFileNameWithoutExtension(path_to_pdf) + "_" + sheet_number.ToString() + ".xls"); //, Microsoft.Office.Interop.Excel.XlFileFormat.xlWorkbookDefault, Type.Missing, Type.Missing, true, false, XlSaveAsAccessMode.xlNoChange, XlSaveConflictResolution.xlLocalSessionChanges, Type.Missing, Type.Missing);
                         }
 
-
+                        
                         // workbook.ExportAsFixedFormat(XlFixedFormatType.xlTypePDF, excel_path[0] + "_bom.pdf");
                         // Close the workbook without saving changes.
-                        XML_Functions.Create_Kabel_XML_File(System.IO.Path.GetDirectoryName(path_to_pdf) + "\\" + "Kabelbeschriftungen.wscx", lookup, no_copies);
-                        XML_Functions.Create_Klemme_XML_File(System.IO.Path.GetDirectoryName(path_to_pdf) + "\\" + "Klemmenbeschriftungen.wscx", klemme_lookup, no_copies);
+                        XML_Functions.Create_Kabel_XML_File(System.IO.Path.GetDirectoryName(path_to_pdf) + "\\" + "Kabelbeschriftungen.wscx", cable_lookup, no_copies);
+                        XML_Functions.Create_Klemme_XML_File(System.IO.Path.GetDirectoryName(path_to_pdf) + "\\" + "Klemmenbeschriftungen.wscx", clamp_lookup, no_copies);
 
                         lookup = null;
                         resultstring = null;
@@ -369,17 +340,7 @@ namespace PDFtoExcelConverter
             return false;
         }
 
-        private static bool findint(int search, int[] array)
-        {
-            for (int i = 0; i < array.Length; i++)
-            {
-                if (search == array[i])
-                {
-                    return true;
-                }
-            }
-            return false;
-        }
+       
 
         private void Form1_Load(object sender, EventArgs e)
         {

@@ -209,7 +209,7 @@ namespace PDFtoExcelConverter
             }
         }
 
-        public static void Create_Klemme_XML_File(string xml_name, int[] klemme_bmk, int nocopies)
+        public static void Create_Klemme_XML_File(string xml_name, string[] klemme_bmk, int nocopies)
         {
             
             try
@@ -253,7 +253,7 @@ namespace PDFtoExcelConverter
                         //For Loop
                         for (int i = 0; i < klemme_bmk.Length ; i++)
                         {
-                            if (klemme_bmk[i] != 0)
+                            if (!string.IsNullOrEmpty(klemme_bmk[i]))
                             {
                                 
                                     for (int k = 0; k < nocopies; k++)
@@ -277,7 +277,7 @@ namespace PDFtoExcelConverter
                                         writer.WriteElementString("Freeze", "False");
                                         writer.WriteElementString("Orientation", "0");
                                         writer.WriteStartElement("TextContent");
-                                        writer.WriteElementString("String", klemme_bmk[i].ToString());
+                                        writer.WriteElementString("String", klemme_bmk[i]);
                                         writer.WriteStartElement("Font");
                                         writer.WriteAttributeString("RefersToID", "2");
                                         writer.WriteEndElement();
