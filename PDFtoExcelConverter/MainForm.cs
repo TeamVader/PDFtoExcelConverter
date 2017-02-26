@@ -162,28 +162,8 @@ namespace PDFtoExcelConverter
                             resultstring = text.ToString().Split(new char[] { ' ' });
                             Sort_and_Filter_Algorithms.Filter_Clamp_BMK(clamp_lookup, resultstring);
                             Sort_and_Filter_Algorithms.Filter_Cable_BMK(cable_lookup, resultstring);
-
-                            for (int j = 0; j < resultstring.Length; j++)
-                            {
-                                
-                                //
-                                foreach (Match match in bmk_regex.Matches(resultstring[j]))
-                                {
-
-
-
-                                    if (findstring(match.Value.Replace("-", ""), lookup) == false)
-                                    {
-
-                                        lookup[arraypointer] = match.Value.Replace("-", "");
-                                        arraypointer++;
-
-                                    }
-                                }
-
-                            }
+                            Sort_and_Filter_Algorithms.Filter_Excel_BMK(lookup, resultstring);
                             
-                            Array.Sort(lookup, StringComparer.InvariantCulture);
                            
                             for (int i = 0; i < lookup.Length; i++)
                             {

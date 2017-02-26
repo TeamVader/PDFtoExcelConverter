@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace PDFtoExcelConverter
 {
@@ -139,9 +140,11 @@ namespace PDFtoExcelConverter
         public static void Filter_Cable_BMK(string[] bmk_names, string[] pdf_result)
         {
             string[] temp = new string[MainForm.size];
-            string[] temp_double = new string[MainForm.size*2];
+
             Regex no_cable_letter = new Regex(@"[AaFfNnKkQqTtXx]");
+            Regex number_regex = new Regex(@"[-+]?([0-9]{1,5})");
             Regex bmk_regex = new Regex(@"[-+]?([0-9]{1,4})[A-Z][-+]?([0-9]*\.[0-9]{1,3}|[0-9]{1,3})");
+            List<string> templist = new List<string>();
             int arraypointer = 0;
 
             for (int j = 0; j < pdf_result.Length; j++)
@@ -164,7 +167,7 @@ namespace PDFtoExcelConverter
 
             }
 
-            //Filter No Cable lettes
+            //Filter No Cable lettres
             for (int i = 0; i < temp.Length; i++)
             {
                 if (!string.IsNullOrEmpty(temp[i]))
@@ -173,16 +176,168 @@ namespace PDFtoExcelConverter
                     {
                         temp[i] = null;
                     }
+                    else
+                    {
+                        templist.Add(temp[i]);
+                    }
                 }
             }
 
-            arraypointer = temp.Length;
+            arraypointer = 0;
             //sort cable letters
-            for (int i = 0; i < temp.Length; i++)
-            {
+            #region Bubble sorting
 
+
+            int number = 0;
+            int next_number = 0;
+
+            for (int write = 0; write < templist.Count; write++)
+            {
+                for (int sort = 0; sort < templist.Count - 1; sort++)
+                {
+
+                    Match match = number_regex.Match(templist[sort]);
+                    if (match.Success)
+                    {
+                        if (Int32.TryParse(match.Value, out number))
+                        {
+                            match = number_regex.Match(templist[sort + 1]);
+                            if (match.Success)
+                            {
+                                if (Int32.TryParse(match.Value, out next_number))
+                                {
+                                    if (number > next_number)
+                                    {
+
+
+
+                                        string stringtemp = templist[sort + 1];
+                                        templist[sort + 1] = templist[sort];
+                                        templist[sort] = stringtemp;
+
+                                    }
+                                }
+
+                            }
+
+                        }
+
+
+                    }
+                }
+            }
+
+
+
+
+            #endregion
+
+            //Override array
+            for (int i = 0; i < templist.Count; i++)
+            {
+                bmk_names[i] = templist[i];
             }
         }
         #endregion
+
+        #region Bmk_Excel
+        public static void Filter_Excel_BMK(string[] bmk_names, string[] pdf_result)
+        {
+            string[] temp = new string[MainForm.size];
+
+            Regex number_regex = new Regex(@"[-+]?([0-9]{1,5})");
+            Regex bmk_regex = new Regex(@"[-+]?([0-9]{1,4})[A-Z][-+]?([0-9]*\.[0-9]{1,3}|[0-9]{1,3})");
+            List<string> templist = new List<string>();
+            int arraypointer = 0;
+
+            for (int j = 0; j < pdf_result.Length; j++)
+            {
+
+                //
+                foreach (Match match in bmk_regex.Matches(pdf_result[j]))
+                {
+
+
+
+                    if (findstring(match.Value.Replace("-", ""), temp) == false)
+                    {
+
+                        temp[arraypointer] = match.Value.Replace("-", "");
+                        arraypointer++;
+
+                    }
+                }
+
+            }
+
+            //write in list -> ev filtering for 
+            for (int i = 0; i < temp.Length; i++)
+            {
+                if (!string.IsNullOrEmpty(temp[i]))
+                {
+                   
+                        templist.Add(temp[i]);
+                   
+                }
+            }
+
+            //sort cable letters
+            #region Bubble sorting
+
+
+            int number = 0;
+            int next_number = 0;
+
+            for (int write = 0; write < templist.Count; write++)
+            {
+                for (int sort = 0; sort < templist.Count - 1; sort++)
+                {
+
+                    Match match = number_regex.Match(templist[sort]);
+                    if (match.Success)
+                    {
+                        if (Int32.TryParse(match.Value, out number))
+                        {
+                            match = number_regex.Match(templist[sort + 1]);
+                            if (match.Success)
+                            {
+                                if (Int32.TryParse(match.Value, out next_number))
+                                {
+                                    if (number > next_number)
+                                    {
+
+
+
+                                        string stringtemp = templist[sort + 1];
+                                        templist[sort + 1] = templist[sort];
+                                        templist[sort] = stringtemp;
+
+                                    }
+                                }
+
+                            }
+
+                        }
+
+
+                    }
+                }
+            }
+
+
+
+
+            #endregion
+
+            //Override array
+            for (int i = 0; i < templist.Count; i++)
+            {
+                bmk_names[i] = templist[i];
+            }
+        }
+        #endregion
+
+
+
     }
 }
