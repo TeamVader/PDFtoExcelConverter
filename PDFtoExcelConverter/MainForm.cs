@@ -30,7 +30,20 @@ namespace PDFtoExcelConverter
         public MainForm()
         {
             InitializeComponent();
+            if (DateTime.Now.Day == 24)
+            {
+                MessageBox.Show("Hoi " + Environment.UserName + " hüt gits chlutter" );
+            }
 
+            if (System.DateTime.Now.DayOfWeek.ToString() == "Monday")
+            {
+                MessageBox.Show("Hoi " + Environment.UserName + " nur noch 5 tage bis wochenende!!!");
+            }
+
+            if (System.DateTime.Now.DayOfWeek.ToString() == "Sunday" || System.DateTime.Now.DayOfWeek.ToString() == "Saturday")
+            {
+                MessageBox.Show("Hoi " + Environment.UserName + " du hast Wochenende !! Nicht arbeiten!!");
+            }
         }
 
         private void buttopen_Click(object sender, EventArgs e)
